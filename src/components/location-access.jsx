@@ -5,18 +5,16 @@ const LocationAccess = ({ setLocationData }) => {
     // Handle location data
     // console.log(window.Telegram.WebApp.LocationManager);
 
-    console.log(
-      window.Telegram.WebApp.LocationManager.init(() => {
-        if (window.Telegram.WebApp.LocationManager.isInited) {
-          console.log("LocationManager initialized successfully.");
+    window.Telegram.WebApp.LocationManager.init(() => {
+      if (window.Telegram.WebApp.LocationManager.isInited) {
+        console.log("LocationManager initialized successfully.");
 
-          // Now you can use location-related features
-          window.Telegram.WebApp.LocationManager.requestLocationAccess();
-        } else {
-          console.log("Failed to initialize LocationManager.");
-        }
-      })
-    );
+        // Now you can use location-related features
+        window.Telegram.WebApp.LocationManager.requestLocationAccess();
+      } else {
+        console.log("Failed to initialize LocationManager.");
+      }
+    });
     window.Telegram.WebApp.LocationManager.getLocation((locationData) => {
       if (locationData) {
         setLocationData(locationData);
