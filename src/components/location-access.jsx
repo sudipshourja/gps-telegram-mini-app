@@ -19,7 +19,7 @@ const LocationAccess = ({ setLocationData }) => {
     const interval = setInterval(async () => {
       window.Telegram.WebApp.LocationManager.getLocation((locationData) => {
         if (locationData) {
-          console.log(counter);
+          console.log(++counter);
           console.log(Date.now());
           // setLocationData(locationData);
           // console.log("Location data received:", locationData);
