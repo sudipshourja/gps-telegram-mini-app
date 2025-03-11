@@ -4,6 +4,7 @@ const LocationAccess = ({ setLocationData }) => {
   const handleLocationRequest = () => {
     // Handle location data
     // console.log(window.Telegram.WebApp.LocationManager);
+    let counter = 0;
 
     window.Telegram.WebApp.LocationManager.init(() => {
       if (window.Telegram.WebApp.LocationManager.isInited) {
@@ -18,11 +19,14 @@ const LocationAccess = ({ setLocationData }) => {
     const interval = setInterval(async () => {
       window.Telegram.WebApp.LocationManager.getLocation((locationData) => {
         if (locationData) {
+          console.log(counter);
+          console.log(Date.now());
           // setLocationData(locationData);
           // console.log("Location data received:", locationData);
           // console.log("Latitude:", locationData.latitude);
           // console.log("Longitude:", locationData.longitude);
           // console.log("Accuracy:", locationData.accuracy, "meters");
+
         } else {
           console.log("Access to location was not granted.");
         }
