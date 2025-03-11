@@ -1,40 +1,49 @@
+import { useState } from "react";
 import LocationIcon from "../constants/icons";
 
-const LocationAccess = ({ setLocationData }) => {
-  const handleLocationRequest = () => {
-    // Handle location data
-    // console.log(window.Telegram.WebApp.LocationManager);
+const LocationAccess = () => {
+  const [locationData, setLocationData] = useState(null);
+  const [error, setError] = useState(null);
+  const [isTracking, setIsTracking] = useState(false);
 
+  const handleLocationRequest = () => {
+    // Initialize LocationManager
     window.Telegram.WebApp.LocationManager.init(() => {
       if (window.Telegram.WebApp.LocationManager.isInited) {
         console.log("LocationManager initialized successfully.");
 
-        // Now you can use location-related features
-        window.Telegram.WebApp.LocationManager.requestLocationAccess();
+        // Request location access
+        window.Telegram.WebApp.LocationManager.requestLocationAccess((granted) => {
+          if (granted) {
+            console.log("Location access granted.");
+            setIsTracking(true);
+
+            // Start tracking location updates
+            const interval = setInterval(() => {
+              window.Telegram.WebApp.LocationManager.getLocation((locationData) => {
+                if (locationData) {
+                  console.log("Location data received:", locationData);
+                  setLocationData(locationData); // Update state with new location data
+                } else {
+                  setError("Failed to get location data.");
+                }
+              });
+            }, 15000); // Update every 15 seconds
+            // Cleanup interval on unmount
+            return () => clearInterval(interval);
+          } else {
+            setError("Location access denied.");
+          }
+        });
       } else {
-        console.log("Failed to initialize LocationManager.");
+        setError("Failed to initialize LocationManager.");
       }
     });
-    const interval = setInterval(async () => {
-      window.Telegram.WebApp.LocationManager.getLocation((locationData) => {
-        if (locationData) {
-          console.log(new Date(Date.now()));
-          // setLocationData(locationData);
-          // console.log("Location data received:", locationData);
-          // console.log("Latitude:", locationData.latitude);
-          // console.log("Longitude:", locationData.longitude);
-          // console.log("Accuracy:", locationData.accuracy, "meters");
-
-        } else {
-          console.log("Access to location was not granted.");
-        }
-      });
-    }, 5000);
   };
 
   return (
     <div className="h-screen w-full flex items-center justify-center flex-col gap-10 px-4">
-      <div className=" p-3 bg-green-950 rounded-full">
+      <div className="p-3 bg-green-950 rounded-full">
         <LocationIcon className="text-yellow-50" width={50} height={50} />
       </div>
       <div className="text-center">
@@ -45,6 +54,26 @@ const LocationAccess = ({ setLocationData }) => {
           Enable location access to get accurate weather for...
         </p>
       </div>
+
+      {/* Display location data */}
+      {locationData && (
+        <div className="w-full text-center">
+          <h2 className="text-lg font-medium mb-2">Location Updates</h2>
+          <p>Latitude: {locationData.latitude}</p>
+          <p>Longitude: {locationData.longitude}</p>
+          <p>Accuracy: {locationData.accuracy} meters</p>
+          <p>Last Updated: {new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })}</p>
+        </div>
+      )}
+
+      {/* Display error message */}
+      {error && (
+        <div className="w-full text-center text-red-500">
+          <p>{error}</p>
+        </div>
+      )}
+
+      {/* Button to request location access */}
       <div
         onClick={handleLocationRequest}
         className="w-full flex items-center justify-center py-2 cursor-pointer hover:bg-green-950 bg-[#0f1818] border-2 border-white/10 rounded-xl"
